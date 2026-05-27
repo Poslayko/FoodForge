@@ -1,0 +1,84 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# .NET
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.nupkg
+*.snupkg
+*.symbols.nupkg
+project.lock.json
+project.assets.json
+artifacts/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+
+# Visual Studio
+.vs/
+Generated\ Files/
+_ReSharper*/
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Avalonia / XAML preview and generated designer caches
+*.g.cs
+*.g.i.cs
+
+# NuGet
+.nuget/
+packages/
+*.nuget.props
+*.nuget.targets
+
+# Local database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# App/package outputs
+*.app
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.msi
+*.dmg
+*.pkg
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
