@@ -59,6 +59,12 @@ packages/
 
 # App/package outputs
 *.app
+!FoodForge.App/
+!FoodForge.App/**
+FoodForge.App/[Bb]in/
+FoodForge.App/[Oo]bj/
+FoodForge.App/**/*.lscache
+FoodForge.App/**/*.user
 *.exe
 *.dll
 *.pdb

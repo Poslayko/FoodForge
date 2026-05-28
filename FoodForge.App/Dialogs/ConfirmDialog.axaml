@@ -1,0 +1,43 @@
+<Window
+    x:Class="FoodForge.App.Dialogs.ConfirmDialog"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dialogs="clr-namespace:FoodForge.App.Dialogs"
+    Title="{Binding Title}"
+    Width="360"
+    Height="160"
+    x:DataType="dialogs:ConfirmDialog"
+    Background="#F1E8D8"
+    CanResize="False"
+    Foreground="#2F5D50"
+    WindowStartupLocation="CenterOwner">
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#1F2522" />
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="16"
+          RowDefinitions="*,Auto">
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Orientation="Horizontal"
+                    Spacing="8">
+
+            <Button
+                Background="#2F5D50"
+                Click="Ok_Click"
+                Content="OK" />
+
+            <Button
+                Background="#2F5D50"
+                Click="Cancel_Click"
+                Content="Cancel" />
+
+        </StackPanel>
+    </Grid>
+</Window>
