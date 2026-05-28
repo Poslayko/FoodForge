@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+
 public sealed class DishRepository
 {
     public List<Dish> GetAll()
@@ -50,5 +50,20 @@ public sealed class DishRepository
         db.SaveChanges();
 
         return templateDish;
+    }
+
+    public void Delete(int dishId)
+    {
+        using var db = FoodForgeDbContextProvider.Create();
+
+        var dish = db.Dishes.FirstOrDefault(x => x.Id == dishId);
+
+        if (dish is null)
+        {
+            return;
+        }
+
+        db.Dishes.Remove(dish);
+        db.SaveChanges();
     }
 }

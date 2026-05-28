@@ -7,7 +7,6 @@ public static class FoodForgeDbContextProvider
         var options = new DbContextOptionsBuilder<FoodForgeDbContext>()
             .UseSqlite(DatabasePaths.GetConnectionString())
             .UseSnakeCaseNamingConvention()
-            .EnableSensitiveDataLogging()
             .Options;
 
         return new FoodForgeDbContext(options);
