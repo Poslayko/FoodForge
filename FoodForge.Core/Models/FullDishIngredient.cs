@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Collections;
 public sealed record class FullDishIngredient 
 {
     public int Id { get; set; }

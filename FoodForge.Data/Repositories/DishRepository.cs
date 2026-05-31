@@ -2,9 +2,15 @@ using Microsoft.EntityFrameworkCore;
 
 public sealed class DishRepository
 {
+    private readonly IDbContextFactory<FoodForgeDbContext> _dbContextFactory;
+
+    public DishRepository(IDbContextFactory<FoodForgeDbContext> dbContextFactory)
+    {
+        _dbContextFactory = dbContextFactory;
+    }
     public List<Dish> GetAll()
     {
-        using var db = FoodForgeDbContextProvider.Create();
+        using var db = _dbContextFactory.CreateDbContext();
 
         return db.Dishes
             .OrderByDescending(x => x.CreatedAt)
@@ -13,7 +19,7 @@ public sealed class DishRepository
 
         public List<Dish> GetAllById(int profileId)
         {
-        using var db = FoodForgeDbContextProvider.Create();
+        using var db = _dbContextFactory.CreateDbContext();
 
         return db.Dishes
             .Include(x => x.DishIngredients)
@@ -25,9 +31,9 @@ public sealed class DishRepository
 
     public Dish Create(int profileId)
     {
-        using var db = FoodForgeDbContextProvider.Create();
+        using var db = _dbContextFactory.CreateDbContext();
 
-        if (!db.Profile.Any(x => x.Id == profileId))
+        if (!db.Profiles.Any(x => x.Id == profileId))
         {
             throw new InvalidOperationException($"Profile with id {profileId} was not found.");
         }
@@ -54,7 +60,7 @@ public sealed class DishRepository
 
     public void Delete(int dishId)
     {
-        using var db = FoodForgeDbContextProvider.Create();
+        using var db = _dbContextFactory.CreateDbContext();
 
         var dish = db.Dishes.FirstOrDefault(x => x.Id == dishId);
 

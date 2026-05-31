@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 public sealed class IngredientRepository
 {
-    public static List<Ingredient> CreateIfNonExist(FoodForgeDbContext db, 
+    public List<Ingredient> CreateIfNonExist(FoodForgeDbContext db, 
         List<string> names)
     {
         List<string> existingIngredients = db.Ingredients
@@ -23,8 +21,6 @@ public sealed class IngredientRepository
                 db.Ingredients.Add(newIngredient);
             }
         }
-
-        db.SaveChanges();
 
         return db.Ingredients
             .Where(x => names.Contains(x.Name))

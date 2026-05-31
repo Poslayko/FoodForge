@@ -6,6 +6,11 @@ public sealed class FoodForgeDbContextFactory
 {
     public FoodForgeDbContext CreateDbContext(string[] args)
     {
-        return FoodForgeDbContextProvider.Create();
+        var options = new DbContextOptionsBuilder<FoodForgeDbContext>()
+            .UseSqlite(DatabasePaths.GetConnectionString())
+            .UseSnakeCaseNamingConvention()
+            .Options;
+
+        return new FoodForgeDbContext(options);
     }
 }

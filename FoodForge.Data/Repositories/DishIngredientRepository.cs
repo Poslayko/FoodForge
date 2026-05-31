@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 public sealed class DishIngredientRepository
 {
+    private readonly IDbContextFactory<FoodForgeDbContext> _dbContextFactory;
+
+    public DishIngredientRepository(IDbContextFactory<FoodForgeDbContext> dbContextFactory)
+    {
+        _dbContextFactory = dbContextFactory;
+    }
     public List<FullDishIngredient> GetAllByDishId(int DishId)
     {
-        using var db = FoodForgeDbContextProvider.Create();
+        using var db = _dbContextFactory.CreateDbContext(); 
 
         return db.DishIngredients
             .Where(x => x.DishId == DishId)
@@ -24,13 +29,13 @@ public sealed class DishIngredientRepository
             .ToList();
     }
 
-    public static void Delete(FoodForgeDbContext db, int dishId)
+    public void Delete(FoodForgeDbContext db, int dishId)
     {
         var dishIngredients = db.DishIngredients.Where(x => x.DishId == dishId).ToList();
         db.DishIngredients.RemoveRange(dishIngredients);
     }
 
-    public static void Create(FoodForgeDbContext db, List<DishIngredient> dishIngredients)
+    public void Create(FoodForgeDbContext db, List<DishIngredient> dishIngredients)
     {
         db.DishIngredients.AddRange(dishIngredients);
     }

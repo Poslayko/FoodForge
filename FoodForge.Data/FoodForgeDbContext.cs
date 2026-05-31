@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 public sealed class FoodForgeDbContext : DbContext
 {
-    public DbSet<Profile> Profile => Set<Profile>();
+    public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<Dish> Dishes => Set<Dish>();
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     public DbSet<DishIngredient> DishIngredients => Set<DishIngredient>();

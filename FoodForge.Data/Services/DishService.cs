@@ -1,10 +1,22 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-public sealed class DishServices
+public sealed class DishService
 {
-    public static FullEditingDish Update(FullEditingDish dish)
+    private readonly IDbContextFactory<FoodForgeDbContext> _dbContextFactory;
+    private readonly IngredientRepository _ingredientRepository;
+    private readonly DishIngredientRepository _dishIngredientRepository;
+
+    public DishService(IDbContextFactory<FoodForgeDbContext> dbContextFactory,
+        IngredientRepository ingredientRepository, 
+        DishIngredientRepository dishIngredientRepository)
     {
-        using var db = FoodForgeDbContextProvider.Create();
+        _dbContextFactory = dbContextFactory;
+        _ingredientRepository = ingredientRepository;
+        _dishIngredientRepository = dishIngredientRepository;
+    }
+
+    public FullEditingDish Update(FullEditingDish dish)
+    {
+        using var db = _dbContextFactory.CreateDbContext();
 
         var dishId = dish.Id;
 
@@ -61,7 +73,7 @@ public sealed class DishServices
         }
     }
 
-    private static void UpdateDishIngredients(FoodForgeDbContext db, int dishId, 
+    private void UpdateDishIngredients(FoodForgeDbContext db, int dishId, 
         FullEditingDish dish)
     {
         List<FullDishIngredient> dishIngredients = dish.Ingredients;
@@ -70,7 +82,7 @@ public sealed class DishServices
         if (dishIngredients != null)
         {
             List<string> dishIngredientsName = dishIngredients.Select(x => x.Name).ToList();
-            ingredients = IngredientRepository.CreateIfNonExist(db, dishIngredientsName);
+            ingredients = _ingredientRepository.CreateIfNonExist(db, dishIngredientsName);
 
             List<DishIngredient> updatedDishIngredients = new();
 
@@ -83,7 +95,7 @@ public sealed class DishServices
 
                 var updatedIngredient = new DishIngredient()
                 {
-                    DishId = dishIngredient.DishId,
+                    DishId = dishId,
                     IngredientId = dishIngredient.IngredientId,
                     Order = dishIngredient.Order,
                     Quantity = dishIngredient.Quantity,
@@ -94,8 +106,8 @@ public sealed class DishServices
                 updatedDishIngredients.Add(updatedIngredient);
             }
 
-            DishIngredientRepository.Delete(db, dishId);
-            DishIngredientRepository.Create(db, updatedDishIngredients);
+            _dishIngredientRepository.Delete(db, dishId);
+            _dishIngredientRepository.Create(db, updatedDishIngredients);
         }
     }
 

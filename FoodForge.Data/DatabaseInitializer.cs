@@ -13,9 +13,9 @@ public sealed class DatabaseInitializer
     {
         _dbContext.Database.Migrate();
 
-        if(!_dbContext.Profile.Any())
+        if(!_dbContext.Profiles.Any())
         {
-            _dbContext.Profile.Add(new Profile
+            _dbContext.Profiles.Add(new Profile
             {
                 Name = "Default"
             });

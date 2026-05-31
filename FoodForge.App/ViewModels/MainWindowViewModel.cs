@@ -9,6 +9,7 @@ namespace FoodForge.App.ViewModels;
 public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly ProfileRepository _profileRepository;
+    private readonly DishService _dishService;
     private readonly DishRepository _dishRepository;
     private readonly DishIngredientRepository _dishIngredientRepository;
     private readonly RecipeStepRepository _recipeStepRepository;
@@ -41,7 +42,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    public ObservableCollection<RecipeStep> _editingRecipeSteps = new();
+    private ObservableCollection<RecipeStep> _editingRecipeSteps = new();
     public ObservableCollection<RecipeStep> EditingRecipeSteps
     {
         get => _editingRecipeSteps;
@@ -116,11 +117,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     }
 
     public MainWindowViewModel(IDialogService dialogService, ProfileRepository profileRepository,
-        DishRepository dishRepository, DishIngredientRepository dishIngredientRepository,
+        DishRepository dishRepository, DishService dishService, 
+        DishIngredientRepository dishIngredientRepository, 
         RecipeStepRepository recipeStepRepository)
     {
         _profileRepository = profileRepository;
         _dishRepository = dishRepository;        
+        _dishService = dishService;
         _dishIngredientRepository = dishIngredientRepository;
         _recipeStepRepository = recipeStepRepository;
         _dialogService = dialogService;
@@ -154,7 +157,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         List<Dish> dbDishes = _dishRepository.GetAllById(firstProfile.Id);
 
         Dishes = new ObservableCollection<FullEditingDish>(
-            DishServices.ConvertToFullEditingDishes(dbDishes));
+            DishService.ConvertToFullEditingDishes(dbDishes));
 
         SelectedDish = Dishes.FirstOrDefault();
     }
@@ -182,7 +185,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
-        var createdDish = DishServices.ConvertToFullEditingDish(
+        var createdDish = DishService.ConvertToFullEditingDish(
             _dishRepository.Create(SelectedProfile.Id));
 
         Dishes.Insert(0, createdDish);
@@ -256,7 +259,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         AddEditingIngredientsAndDeleteEmpty();
         AddEditingRecipeStepsAndDeleteEmpty();
 
-        var savedDish = DishServices.Update(EditingDish);
+        var savedDish = _dishService.Update(EditingDish);
 
         var index = Dishes.IndexOf(SelectedDish);
 
