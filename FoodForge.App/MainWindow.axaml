@@ -5,6 +5,7 @@
         xmlns:vm="clr-namespace:FoodForge.App.ViewModels"
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="FoodForge.App.MainWindow"
+        x:Name="Root"
         x:DataType="vm:MainWindowViewModel"
         Title="FoodForge">
 
@@ -123,7 +124,7 @@
                         <StackPanel Grid.Row="0"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Name:" FontWeight="SemiBold"></TextBlock>
                             <TextBlock Text="{Binding SelectedDish.Name}"></TextBlock>
                         </StackPanel>
@@ -131,12 +132,12 @@
                         <StackPanel Grid.Row="0"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <TextBlock Text="Name:" 
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center">
                             </TextBlock>
-                            <TextBox Text="{Binding EditingDish.Name}"
+                            <TextBox Text="{Binding EditState.EditingDish.Name}"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center">
                             </TextBox>
@@ -145,7 +146,7 @@
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Description:" FontWeight="SemiBold"></TextBlock>
                             <TextBlock Text="{Binding SelectedDish.Description}"></TextBlock>
                         </StackPanel>
@@ -153,12 +154,12 @@
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <TextBlock Text="Description:" 
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center">
                             </TextBlock>
-                            <TextBox Text="{Binding EditingDish.Description}"
+                            <TextBox Text="{Binding EditState.EditingDish.Description}"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center">
                             </TextBox>
@@ -167,7 +168,7 @@
                         <StackPanel Grid.Row="2"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Spent time:" FontWeight="SemiBold" />
                             <TextBlock Text="{Binding SelectedDish.SpentTimeMinutes}" />
                             <TextBlock Text="minutes" />
@@ -176,11 +177,11 @@
                         <StackPanel Grid.Row="2"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <TextBlock Text="Spent time:" 
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center"/>
-                            <NumericUpDown Value="{Binding EditingDish.SpentTimeMinutes}"
+                            <NumericUpDown Value="{Binding EditState.EditingDish.SpentTimeMinutes}"
                                         Minimum="0"
                                         Maximum="2000"
                                         Increment="5"
@@ -192,7 +193,7 @@
                         <StackPanel Grid.Row="3"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Taste rating:" FontWeight="SemiBold" />
                             <TextBlock Text="{Binding SelectedDish.TasteRating}" />
                         </StackPanel>
@@ -200,11 +201,11 @@
                         <StackPanel Grid.Row="3"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                                 <TextBlock Text="Rating:" 
                                         FontWeight="SemiBold"
                                         VerticalAlignment="Center"/>
-                                <NumericUpDown Value="{Binding EditingDish.TasteRating}"
+                                <NumericUpDown Value="{Binding EditState.EditingDish.TasteRating}"
                                             Minimum="0"
                                             Maximum="10"
                                             Increment="1">
@@ -214,7 +215,7 @@
                         <StackPanel Grid.Row="4"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Ingridients:"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center" />
@@ -223,7 +224,7 @@
                         <StackPanel Grid.Row="5"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <ItemsControl ItemsSource="{Binding SelectedDish.Ingredients}" 
                                         Background="#E9DEC7">
                                 <ItemsControl.ItemTemplate>
@@ -245,7 +246,7 @@
                         <StackPanel Grid.Row="4"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <TextBlock Text="Ingridients:"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center" />
@@ -254,9 +255,9 @@
                         <StackPanel Grid.Row="5"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
 
-                            <ListBox ItemsSource="{Binding EditingIngredients}" 
+                            <ListBox ItemsSource="{Binding EditState.EditingIngredients}" 
                                     Background="#E9DEC7">
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
@@ -279,19 +280,19 @@
                                             <Button Content="-"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding DataContext.DeleteIngredientCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.DeleteIngredientCommand}" 
                                                     CommandParameter="{Binding}"/>
 
                                             <Button Content="↑"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF" 
-                                                    Command="{ReflectionBinding DataContext.PushUpIngredientCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushUpIngredientCommand}"
                                                     CommandParameter="{Binding}"/>
 
                                             <Button Content="↓"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding DataContext.PushDownIngredientCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushDownIngredientCommand}"
                                                     CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </DataTemplate>
@@ -302,17 +303,17 @@
                         <StackPanel Grid.Row="6"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <Button Content="Add"
                                     Background="#2F5D50"
                                     Foreground="#FFFFFF"
-                                    Command="{Binding AddIngredientCommand}" />
+                                    Command="{Binding EditState.AddIngredientCommand}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="7"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <TextBlock Text="Recipe steps:"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center"/>
@@ -321,7 +322,7 @@
                         <StackPanel Grid.Row="8"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInStandardDisplayDishMode}">
+                                    IsVisible="{Binding IsInViewMode}">
                             <ItemsControl ItemsSource="{Binding SelectedDish.RecipeSteps}"
                                         Background="#E9DEC7">
                                 <ItemsControl.ItemTemplate>
@@ -343,7 +344,7 @@
                         <StackPanel Grid.Row="7"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <TextBlock Text="Recipe steps:"
                                     FontWeight="SemiBold"
                                     VerticalAlignment="Center"/>
@@ -352,9 +353,9 @@
                         <StackPanel Grid.Row="8"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
 
-                            <ListBox ItemsSource="{Binding EditingRecipeSteps}"
+                            <ListBox ItemsSource="{Binding EditState.EditingRecipeSteps}"
                                     Background="#E9DEC7">
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
@@ -379,19 +380,19 @@
                                             <Button Content="-"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding DataContext.DeleteRecipeStepCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.DeleteRecipeStepCommand}" 
                                                     CommandParameter="{Binding}"/>
 
                                             <Button Content="↑"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF" 
-                                                    Command="{ReflectionBinding DataContext.PushUpRecipeStepCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushUpRecipeStepCommand}"
                                                     CommandParameter="{Binding}"/>
 
                                             <Button Content="↓"
                                                     Background="#2F5D50"
                                                     Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding DataContext.PushDownRecipeStepCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushDownRecipeStepCommand}"
                                                     CommandParameter="{Binding}"/>
                                         </StackPanel>
                                     </DataTemplate>
@@ -402,11 +403,11 @@
                         <StackPanel Grid.Row="9"
                                     Orientation="Horizontal"
                                     Spacing="8"
-                                    IsVisible="{Binding IsInEditDisplayDishMode}">
+                                    IsVisible="{Binding IsInEditMode}">
                             <Button Content="Add"
                                     Background="#2f5d50"
                                     Foreground="#ffffff"
-                                    Command="{Binding AddRecipeStepCommand}"/>
+                                    Command="{Binding EditState.AddRecipeStepCommand}"/>
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>
@@ -418,8 +419,8 @@
                             VerticalAlignment="Bottom"
                             Background="#2F5D50"
                             Foreground="#FFFFFF"
-                            IsVisible="{Binding IsInStandardDisplayDishMode}"
-                            Command="{Binding ChangeDisplayModeOnEditCommand}">
+                            IsVisible="{Binding IsInViewMode}"
+                            Command="{Binding ChangeViewModeOnEditCommand}">
                     </Button>
 
                     <StackPanel HorizontalAlignment="Right"
@@ -427,19 +428,19 @@
                                 Orientation="Horizontal"
                                 Spacing="12"
                                 Background="#E9DEC7"
-                                IsVisible="{Binding IsInEditDisplayDishMode}">
+                                IsVisible="{Binding IsInEditMode}">
 
                         <Button Content="Save"
                                 Background="#2F5D50"
                                 Foreground="#FFFFFF"
-                                IsVisible="{Binding IsInEditDisplayDishMode}"
+                                IsVisible="{Binding IsInEditMode}"
                                 Command="{Binding SaveEditingDishCommand}">
                         </Button>
 
                         <Button Content="Cancel"
                                 Background="#8C4A3F"
                                 Foreground="#FFFFFF"
-                                IsVisible="{Binding IsInEditDisplayDishMode}"
+                                IsVisible="{Binding IsInEditMode}"
                                 Command="{Binding CancelEditingCommand}">
                         </Button>
                     </StackPanel>
