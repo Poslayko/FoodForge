@@ -53,6 +53,7 @@ public partial class App : Application
         services.AddTransient<IngredientRepository>();
         services.AddTransient<DishIngredientRepository>();
         services.AddTransient<RecipeStepRepository>();
+        services.AddTransient<ReorderService>();
 
         services.AddSingleton<IDialogService, DialogService>();
 

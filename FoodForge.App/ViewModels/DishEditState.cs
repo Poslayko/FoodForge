@@ -12,6 +12,8 @@ public sealed class DishEditState : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    private readonly ReorderService _reorderService;
+
     private FullEditingDish? _editingDish;
     public FullEditingDish? EditingDish
     {
@@ -65,8 +67,9 @@ public sealed class DishEditState : INotifyPropertyChanged
     public ICommand PushUpRecipeStepCommand { get; }
     public ICommand PushDownRecipeStepCommand { get; }
 
-public DishEditState()
+    public DishEditState(ReorderService reorderService)
     {        
+        _reorderService = reorderService;
         AddIngredientCommand = new RelayCommand(AddIngredient);
         DeleteIngredientCommand = new RelayCommand(DeleteIngredient);
         PushUpIngredientCommand = new RelayCommand(PushUpIngredient);
@@ -104,11 +107,13 @@ public DishEditState()
     {
         var ingredientsForSave = EditingIngredients
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .Select((x, index) => new FullDishIngredient
+            .Select((x, index) => x with
             {
                 Name = x.Name.Trim(),
                 Quantity = x.Quantity.Trim(),
-                Order = index + 1
+                Order = index + 1,
+                MeasurementUnit = x.MeasurementUnit?.Trim(),
+                Comment = x.Comment?.Trim()
             })
             .ToList();
         
@@ -118,13 +123,16 @@ public DishEditState()
     private List<RecipeStep> BuildRecipeStepsForSave()
     {
         var recipeStepsForSave = EditingRecipeSteps
-            .Where(x => !string.IsNullOrWhiteSpace(x.Description) ||
-                x.TimeMinutes < 0)
+            .Where(x => !string.IsNullOrWhiteSpace(x.Description) &&
+                x.TimeMinutes >= 0)
             .Select((x, index) => new RecipeStep
             {
                 Description = x.Description.Trim(),
                 Comment = x.Comment?.Trim(),
-                Order = index + 1
+                Order = index + 1,
+                Id = x.Id,
+                DishId = x.DishId,
+                TimeMinutes = x.TimeMinutes
             })
             .ToList();
 
@@ -154,6 +162,10 @@ public DishEditState()
         }
 
         EditingIngredients.Remove(ingredient);
+
+        _reorderService.RefreshOrders(EditingIngredients);
+
+        EditingIngredients = new ObservableCollection<FullDishIngredient>(EditingIngredients);
     }
 
     private void PushUpIngredient(object? parameter)
@@ -163,17 +175,9 @@ public DishEditState()
             return;
         }
 
-        int ingredientIndex = EditingIngredients.IndexOf(ingredient);
-        int previousIndex = ingredientIndex - 1;
+        _reorderService.MoveUp(EditingIngredients, ingredient);
 
-        if (ingredientIndex <= 0)
-        {
-            return;
-        }
-
-        EditingIngredients.Move(ingredientIndex, previousIndex);
-
-        RefreshIngredientOrders();
+        EditingIngredients = new ObservableCollection<FullDishIngredient>(EditingIngredients);
     }
 
     private void PushDownIngredient(object? parameter)
@@ -183,24 +187,7 @@ public DishEditState()
             return;
         }
 
-        int ingredientIndex = EditingIngredients.IndexOf(ingredient);
-        int nextIndex = ingredientIndex + 1;
-
-        if (ingredientIndex >= EditingIngredients.Count - 1)
-        {
-            return;
-        }
-
-        EditingIngredients.Move(ingredientIndex, nextIndex);
-
-        RefreshIngredientOrders();
-    }
-    private void RefreshIngredientOrders()
-    {
-        for (int i = 0; i < EditingIngredients.Count; i++)
-        {
-            EditingIngredients[i].Order = i + 1;
-        }
+        _reorderService.MoveDown(EditingIngredients, ingredient);
 
         EditingIngredients = new ObservableCollection<FullDishIngredient>(EditingIngredients);
     }
@@ -228,6 +215,10 @@ public DishEditState()
         }
 
         EditingRecipeSteps.Remove(step);
+
+        _reorderService.RefreshOrders(EditingRecipeSteps);
+
+        EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
     }
 
     private void PushUpRecipeStep(object? parameter)
@@ -237,17 +228,9 @@ public DishEditState()
             return;
         }
 
-        int stepIndex = EditingRecipeSteps.IndexOf(step);
-        int previousIndex = stepIndex - 1;
+        _reorderService.MoveUp(EditingRecipeSteps, step);
 
-        if (stepIndex <= 0)
-        {
-            return;
-        }
-
-        EditingRecipeSteps.Move(stepIndex, previousIndex);
-
-        RefreshRecipeStepOrders();
+        EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
     }
 
     private void PushDownRecipeStep(object? parameter)
@@ -257,27 +240,8 @@ public DishEditState()
             return;
         }
 
-        int stepIndex = EditingRecipeSteps.IndexOf(step);
-        int nextIndex = stepIndex + 1;
-
-        if (stepIndex >= EditingRecipeSteps.Count - 1)
-        {
-            return;
-        }
-
-        EditingRecipeSteps.Move(stepIndex, nextIndex);
-
-        RefreshRecipeStepOrders();
-    }
-
-    private void RefreshRecipeStepOrders()
-    {
-        for (int i = 0; i < EditingRecipeSteps.Count; i++)
-        {
-            EditingRecipeSteps[i].Order = i + 1;
-        }
+        _reorderService.MoveDown(EditingRecipeSteps, step);
 
         EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
     }
-
 }

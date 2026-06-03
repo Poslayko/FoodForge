@@ -1,4 +1,4 @@
-public sealed class RecipeStep
+public sealed class RecipeStep : IOrderedItem
 {
     public int Id { get; set; }
     public int DishId { get; set; }

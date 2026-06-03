@@ -13,6 +13,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private readonly DishIngredientRepository _dishIngredientRepository;
     private readonly RecipeStepRepository _recipeStepRepository;
     private readonly DishService _dishService;
+    private readonly ReorderService _reorderService;
     private readonly IDialogService _dialogService;
 
     public ObservableCollection<Profile> Profiles { get; private set; } = new();
@@ -88,13 +89,15 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public MainWindowViewModel(IDialogService dialogService, 
         ProfileRepository profileRepository, DishRepository dishRepository, 
         DishIngredientRepository dishIngredientRepository, 
-        DishService dishService, RecipeStepRepository recipeStepRepository)
+        DishService dishService, RecipeStepRepository recipeStepRepository,
+        ReorderService reorderService)
     {
         _profileRepository = profileRepository;
         _dishRepository = dishRepository;
         _dishIngredientRepository = dishIngredientRepository;
         _recipeStepRepository = recipeStepRepository;
         _dishService = dishService;
+        _reorderService = reorderService;
         _dialogService = dialogService;
 
         CreateDishCommand = new RelayCommand(CreateDish);
@@ -155,7 +158,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         if (SelectedDish is null)
         {
             EditState = null;
-            OnPropertyChanged(nameof(SelectedDish));
             return;
         }
 
@@ -212,7 +214,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
         EditState = null;
 
-        if (Dishes.Count() != 0)
+        if (Dishes.Count != 0)
         {
             SelectedDish = Dishes[0];
         }
@@ -236,7 +238,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
-        var editState = new DishEditState();
+        var editState = new DishEditState(_reorderService);
 
         editState.EditingIngredients = new ObservableCollection<FullDishIngredient>(
             SelectedDish.Ingredients.Select(x => new FullDishIngredient
