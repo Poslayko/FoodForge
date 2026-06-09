@@ -1,4 +1,4 @@
-public sealed record class FullDishIngredient : IOrderedItem
+public sealed class FullDishIngredient : IOrderedItem
 {
     public int Id { get; set; }
     public int DishId { get; set; }

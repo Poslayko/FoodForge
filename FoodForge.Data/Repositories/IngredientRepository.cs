@@ -3,27 +3,27 @@ public sealed class IngredientRepository
     public List<Ingredient> CreateIfNonExist(FoodForgeDbContext db, 
         List<string> names)
     {
-        List<string> existingIngredients = db.Ingredients
+        var existingIngredients = db.Ingredients
             .Where(x => names.Contains(x.Name))
-            .Select(x => x.Name)
             .ToList();
 
-        foreach (var name in names)
-        {
-            if (!existingIngredients.Contains(name))
-            {
-                var newIngredient = new Ingredient()
-                {
-                    Name = name,
-                    NormalizedName = name.Trim().ToLowerInvariant()
-                };
-                
-                db.Ingredients.Add(newIngredient);
-            }
-        }
+        var existingNames = existingIngredients
+            .Select(x => x.Name)
+            .ToHashSet();        
 
-        return db.Ingredients
-            .Where(x => names.Contains(x.Name))
-            .ToList();        
+        var newIngredients = names
+            .Where(name => !existingNames.Contains(name))
+            .Select(name => new Ingredient
+            {
+                Name = name,
+                NormalizedName = name.Trim().ToLowerInvariant()
+            })
+            .ToList();
+
+        db.Ingredients.AddRange(newIngredients);
+
+        return existingIngredients
+            .Concat(newIngredients)
+            .ToList();
     }
 }

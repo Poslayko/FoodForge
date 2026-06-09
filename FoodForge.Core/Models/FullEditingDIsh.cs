@@ -9,5 +9,5 @@ public sealed record class FullEditingDish
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<FullDishIngredient> Ingredients { get; set; } = new();
-    public List<RecipeStep> RecipeSteps { get; set; } = new();
+    public List<FullEditRecipeStep> RecipeSteps { get; set; } = new();
 }

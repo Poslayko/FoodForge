@@ -129,18 +129,32 @@
                             <TextBlock Text="{Binding SelectedDish.Name}"></TextBlock>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="0"
-                                    Orientation="Horizontal"
-                                    Spacing="8"
-                                    IsVisible="{Binding IsInEditMode}">
-                            <TextBlock Text="Name:" 
-                                    FontWeight="SemiBold"
-                                    VerticalAlignment="Center">
+                        <StackPanel
+                            Grid.Row="0"
+                            Orientation="Vertical"
+                            Spacing="4"
+                            IsVisible="{Binding IsInEditMode}">
+                        
+                            <StackPanel 
+                                Orientation="Horizontal"
+                                Spacing="8"> 
+                                <TextBlock Text="Name:" 
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center">
+                                </TextBlock>
+                                <TextBox Text="{Binding EditState.EditingDish.Name}"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center">
+                                </TextBox>
+                            </StackPanel>
+
+                            <TextBlock
+                                Text="{Binding EditState.NameError}"
+                                Foreground="Red"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding EditState.HasDishNameError}">
                             </TextBlock>
-                            <TextBox Text="{Binding EditState.EditingDish.Name}"
-                                    FontWeight="SemiBold"
-                                    VerticalAlignment="Center">
-                            </TextBox>
+                        
                         </StackPanel>
 
                         <StackPanel Grid.Row="1"
@@ -174,21 +188,33 @@
                             <TextBlock Text="minutes" />
                         </StackPanel>
                         
-                        <StackPanel Grid.Row="2"
-                                    Orientation="Horizontal"
-                                    Spacing="8"
-                                    IsVisible="{Binding IsInEditMode}">
-                            <TextBlock Text="Spent time:" 
-                                    FontWeight="SemiBold"
-                                    VerticalAlignment="Center"/>
-                            <NumericUpDown Value="{Binding EditState.EditingDish.SpentTimeMinutes}"
-                                        Minimum="0"
-                                        Maximum="2000"
-                                        Increment="5"
-                                        VerticalAlignment="Center">
-                            </NumericUpDown>
-                            <TextBlock Text="minutes" VerticalAlignment="Center"></TextBlock>
-                        </StackPanel> 
+                        <StackPanel
+                            Grid.Row="2"
+                            Orientation="Vertical"
+                            Spacing="8"
+                            IsVisible="{Binding IsInEditMode}">
+
+                            <StackPanel
+                                Spacing="8"
+                                Orientation="Horizontal">
+                                <TextBlock Text="Spent time:" 
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+                                <NumericUpDown Value="{Binding EditState.EditingDish.SpentTimeMinutes}"
+                                            Increment="5"
+                                            VerticalAlignment="Center"
+                                            ClipValueToMinMax="False">
+                                </NumericUpDown>
+                                <TextBlock Text="minutes" VerticalAlignment="Center"></TextBlock>
+                            </StackPanel> 
+
+                            <TextBlock 
+                                Text="{Binding EditState.SpentTimeMinutesError}"
+                                Foreground="Red"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding EditState.HasSpentTimeMinutesError}">
+                            </TextBlock>
+                        </StackPanel>
 
                         <StackPanel Grid.Row="3"
                                     Orientation="Horizontal"
@@ -198,18 +224,32 @@
                             <TextBlock Text="{Binding SelectedDish.TasteRating}" />
                         </StackPanel>
 
-                        <StackPanel Grid.Row="3"
-                                    Orientation="Horizontal"
-                                    Spacing="8"
-                                    IsVisible="{Binding IsInEditMode}">
+                        <StackPanel
+                            Grid.Row="3"
+                            Orientation="Vertical"
+                            Spacing="8"
+                            IsVisible="{Binding IsInEditMode}">
+
+                            <StackPanel 
+                                Orientation="Horizontal"
+                                Spacing="8">
                                 <TextBlock Text="Rating:" 
                                         FontWeight="SemiBold"
                                         VerticalAlignment="Center"/>
                                 <NumericUpDown Value="{Binding EditState.EditingDish.TasteRating}"
-                                            Minimum="0"
-                                            Maximum="10"
-                                            Increment="1">
+                                            Increment="1"
+                                            ClipValueToMinMax="False">
                                 </NumericUpDown>
+                            </StackPanel>
+
+                            <TextBlock Text="Can be between 0 and 10"></TextBlock>
+
+                            <TextBlock
+                                Text="{Binding EditState.TasteRatingError}"
+                                VerticalAlignment="Center"
+                                Foreground="Red"
+                                IsVisible="{Binding EditState.HasTasteRatingError}">
+                            </TextBlock>
                         </StackPanel>                
 
                         <StackPanel Grid.Row="4"
@@ -366,34 +406,42 @@
                             
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Text="{Binding Order}"
-                                                    VerticalAlignment="Center"
-                                                    FontWeight="SemiBold"
-                                                    Width="13"/>
-                                            <TextBox Text="{Binding Description}" Width="160"/>
-                                            <TextBox Text="{Binding TimeMinutes}" Width="40"/>
-                                            <TextBlock Text=" minutes"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBox Text="{Binding Comment}" Width="160"/>
+                                        <StackPanel Orientation="Vertical" Spacing="4">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Order}"
+                                                        VerticalAlignment="Center"
+                                                        FontWeight="SemiBold"
+                                                        Width="13"/>
+                                                <TextBox Text="{Binding Description}" Width="160"/>
+                                                <TextBox Text="{Binding TimeMinutes}" Width="40"/>
+                                                <TextBlock Text=" minutes"
+                                                        VerticalAlignment="Center"/>
+                                                <TextBox Text="{Binding Comment}" Width="160"/>
 
-                                            <Button Content="-"
-                                                    Background="#2F5D50"
-                                                    Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding #Root.DataContext.EditState.DeleteRecipeStepCommand}" 
-                                                    CommandParameter="{Binding}"/>
+                                                <Button Content="-"
+                                                        Background="#2F5D50"
+                                                        Foreground="#FFFFFF"
+                                                        Command="{ReflectionBinding #Root.DataContext.EditState.DeleteRecipeStepCommand}" 
+                                                        CommandParameter="{Binding}"/>
 
-                                            <Button Content="↑"
-                                                    Background="#2F5D50"
-                                                    Foreground="#FFFFFF" 
-                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushUpRecipeStepCommand}"
-                                                    CommandParameter="{Binding}"/>
+                                                <Button Content="↑"
+                                                        Background="#2F5D50"
+                                                        Foreground="#FFFFFF" 
+                                                        Command="{ReflectionBinding #Root.DataContext.EditState.PushUpRecipeStepCommand}"
+                                                        CommandParameter="{Binding}"/>
 
-                                            <Button Content="↓"
-                                                    Background="#2F5D50"
-                                                    Foreground="#FFFFFF"
-                                                    Command="{ReflectionBinding #Root.DataContext.EditState.PushDownRecipeStepCommand}"
-                                                    CommandParameter="{Binding}"/>
+                                                <Button Content="↓"
+                                                        Background="#2F5D50"
+                                                        Foreground="#FFFFFF"
+                                                        Command="{ReflectionBinding #Root.DataContext.EditState.PushDownRecipeStepCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                            </StackPanel>
+
+                                            <TextBlock
+                                                Text="{Binding TimeMinutesError}"
+                                                Foreground="Red"
+                                                IsVisible="{Binding HasTimeMinutesError}">
+                                            </TextBlock>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>

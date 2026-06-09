@@ -46,7 +46,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             _selectedDish = value;
 
             OnPropertyChanged();
-
             LoadSelectedDishDetails();
         }
     }
@@ -69,6 +68,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
+    private readonly DishEditValidator _dishEditValidator;
+
     public event PropertyChangedEventHandler? PropertyChanged;
     public bool HasNoDishes => Dishes.Count == 0;
     public bool HasDishes => Dishes.Count > 0;
@@ -90,7 +91,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         ProfileRepository profileRepository, DishRepository dishRepository, 
         DishIngredientRepository dishIngredientRepository, 
         DishService dishService, RecipeStepRepository recipeStepRepository,
-        ReorderService reorderService)
+        ReorderService reorderService, DishEditValidator dishEditValidator)
     {
         _profileRepository = profileRepository;
         _dishRepository = dishRepository;
@@ -99,6 +100,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         _dishService = dishService;
         _reorderService = reorderService;
         _dialogService = dialogService;
+        _dishEditValidator = dishEditValidator;
 
         CreateDishCommand = new RelayCommand(CreateDish);
         DeleteDishCommand = new RelayCommand(DeleteDish);
@@ -129,6 +131,13 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private void SaveEditingDish()
     {
         if (SelectedDish is null || EditState is null)
+        {
+            return;
+        }
+
+        _dishEditValidator.Validate(EditState);
+
+        if (EditState.HasValidationErrors)
         {
             return;
         }
@@ -164,7 +173,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         int dishId = SelectedDish.Id;
 
         SelectedDish.Ingredients = _dishIngredientRepository.GetAllByDishId(dishId);
-        SelectedDish.RecipeSteps = _recipeStepRepository.GetAllByDishId(dishId);
+        SelectedDish.RecipeSteps = DishService.ConvertToFullEditRecipeSteps(
+            _recipeStepRepository.GetAllByDishId(dishId));
 
         OnPropertyChanged(nameof(SelectedDish));
     }
@@ -254,15 +264,16 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             })
         );
 
-        editState.EditingRecipeSteps = new ObservableCollection<RecipeStep>(
-            SelectedDish.RecipeSteps.Select(x => new RecipeStep
+        editState.EditingRecipeSteps = new ObservableCollection<FullEditRecipeStep>(
+            SelectedDish.RecipeSteps.Select(x => new FullEditRecipeStep
             {
                 Id = x.Id,
                 DishId = x.DishId,
                 Order = x.Order,
                 Description = x.Description,
                 TimeMinutes = x.TimeMinutes,
-                Comment = x.Comment
+                Comment = x.Comment,
+                TimeMinutesError = null
             })
         );
 

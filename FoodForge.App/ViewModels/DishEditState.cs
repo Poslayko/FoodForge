@@ -44,8 +44,8 @@ public sealed class DishEditState : INotifyPropertyChanged
         }
     }
 
-    private ObservableCollection<RecipeStep> _editingRecipeSteps = new();
-    public ObservableCollection<RecipeStep> EditingRecipeSteps
+    private ObservableCollection<FullEditRecipeStep> _editingRecipeSteps = new();
+    public ObservableCollection<FullEditRecipeStep> EditingRecipeSteps
     {
         get => _editingRecipeSteps;
         set
@@ -67,6 +67,21 @@ public sealed class DishEditState : INotifyPropertyChanged
     public ICommand PushUpRecipeStepCommand { get; }
     public ICommand PushDownRecipeStepCommand { get; }
 
+    public string? NameError { get; private set; } 
+    public string? TasteRatingError { get; private set; }
+    public string? SpentTimeMinutesError { get; private set; }
+
+    public bool HasDishNameError => NameError is not null;
+    public bool HasTasteRatingError => TasteRatingError is not null;
+    public bool HasSpentTimeMinutesError => SpentTimeMinutesError is not null;
+    public bool HasRecipeStepTimeMinutesErrors { get; private set; } = false;
+
+    public bool HasValidationErrors =>
+        HasDishNameError ||
+        HasTasteRatingError ||
+        HasSpentTimeMinutesError ||
+        HasRecipeStepTimeMinutesErrors; 
+
     public DishEditState(ReorderService reorderService)
     {        
         _reorderService = reorderService;
@@ -87,16 +102,6 @@ public sealed class DishEditState : INotifyPropertyChanged
             return null;
         }
 
-        int tasteRating = EditingDish.TasteRating;
-        int spentTimeMinutes = EditingDish.SpentTimeMinutes;
-
-        if (string.IsNullOrWhiteSpace(EditingDish.Name)
-            || tasteRating < 0 || tasteRating > 10
-            || spentTimeMinutes < 0 || spentTimeMinutes > 2000)
-        {
-            return null;
-        }
-
         EditingDish.Ingredients = BuildIngredientsForSave();
         EditingDish.RecipeSteps = BuildRecipeStepsForSave();
 
@@ -107,31 +112,31 @@ public sealed class DishEditState : INotifyPropertyChanged
     {
         var ingredientsForSave = EditingIngredients
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .Select((x, index) => x with
+            .Select((x, index) => new FullDishIngredient()
             {
                 Name = x.Name.Trim(),
                 Quantity = x.Quantity.Trim(),
                 Order = index + 1,
                 MeasurementUnit = x.MeasurementUnit?.Trim(),
-                Comment = x.Comment?.Trim()
+                Comment = x.Comment?.Trim(),
+                DishId = x.DishId
             })
             .ToList();
         
         return ingredientsForSave;
     }
 
-    private List<RecipeStep> BuildRecipeStepsForSave()
+    private List<FullEditRecipeStep> BuildRecipeStepsForSave()
     {
         var recipeStepsForSave = EditingRecipeSteps
-            .Where(x => !string.IsNullOrWhiteSpace(x.Description) &&
-                x.TimeMinutes >= 0)
-            .Select((x, index) => new RecipeStep
+            .Where(x => !string.IsNullOrWhiteSpace(x.Description))
+            .Select((x, index) => new FullEditRecipeStep 
             {
                 Description = x.Description.Trim(),
                 Comment = x.Comment?.Trim(),
                 Order = index + 1,
-                Id = x.Id,
                 DishId = x.DishId,
+                Id = x.Id,
                 TimeMinutes = x.TimeMinutes
             })
             .ToList();
@@ -200,7 +205,7 @@ public sealed class DishEditState : INotifyPropertyChanged
         }
 
         int order = EditingRecipeSteps.Count + 1;
-        EditingRecipeSteps.Add(new RecipeStep()
+        EditingRecipeSteps.Add(new FullEditRecipeStep()
         {
             Order = order,
             DishId = EditingDish.Id
@@ -209,7 +214,7 @@ public sealed class DishEditState : INotifyPropertyChanged
 
     private void DeleteRecipeStep(object? parameter)
     {
-        if (parameter is not RecipeStep step)
+        if (parameter is not FullEditRecipeStep step)
         {
             return;
         }
@@ -218,30 +223,78 @@ public sealed class DishEditState : INotifyPropertyChanged
 
         _reorderService.RefreshOrders(EditingRecipeSteps);
 
-        EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
+        EditingRecipeSteps = new ObservableCollection<FullEditRecipeStep>(EditingRecipeSteps);
     }
 
     private void PushUpRecipeStep(object? parameter)
     {
-        if (parameter is not RecipeStep step)
+        if (parameter is not FullEditRecipeStep step)
         {
             return;
         }
 
         _reorderService.MoveUp(EditingRecipeSteps, step);
 
-        EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
+        EditingRecipeSteps = new ObservableCollection<FullEditRecipeStep>(EditingRecipeSteps);
     }
 
     private void PushDownRecipeStep(object? parameter)
     {
-        if (parameter is not RecipeStep step)
+        if (parameter is not FullEditRecipeStep step)
         {
             return;
         }
 
         _reorderService.MoveDown(EditingRecipeSteps, step);
 
-        EditingRecipeSteps = new ObservableCollection<RecipeStep>(EditingRecipeSteps);
+        EditingRecipeSteps = new ObservableCollection<FullEditRecipeStep>(EditingRecipeSteps);
+    }
+
+    public void ClearDataForValidation()
+    {
+        NameError = null;
+        SpentTimeMinutesError = null;
+        TasteRatingError = null;
+        foreach (var step in EditingRecipeSteps) step.TimeMinutesError = null;
+        HasRecipeStepTimeMinutesErrors = false;
+        OnPropertyChanged(nameof(NameError));
+        OnPropertyChanged(nameof(HasDishNameError));
+        OnPropertyChanged(nameof(TasteRatingError));
+        OnPropertyChanged(nameof(HasTasteRatingError));
+        OnPropertyChanged(nameof(SpentTimeMinutesError));
+        OnPropertyChanged(nameof(HasSpentTimeMinutesError));
+        OnPropertyChanged(nameof(HasRecipeStepTimeMinutesErrors));
+        OnPropertyChanged(nameof(HasValidationErrors));
+    }
+
+    public void SetNameError(string error)
+    {
+        NameError = error;
+        OnPropertyChanged(nameof(NameError));
+        OnPropertyChanged(nameof(HasDishNameError));
+        OnPropertyChanged(nameof(HasValidationErrors));
+    }
+
+    public void SetTasteRatingError(string error)
+    {
+        TasteRatingError = error;
+        OnPropertyChanged(nameof(TasteRatingError));
+        OnPropertyChanged(nameof(HasTasteRatingError));
+        OnPropertyChanged(nameof(HasValidationErrors));
+    }
+
+    public void SetSpentTimeMinutesError(string error)
+    {
+        SpentTimeMinutesError = error;
+        OnPropertyChanged(nameof(SpentTimeMinutesError));
+        OnPropertyChanged(nameof(HasSpentTimeMinutesError));
+        OnPropertyChanged(nameof(HasValidationErrors));
+    }
+
+    public void SetHasRecipeStepTimeMinutesErrors(bool b)
+    {
+        HasRecipeStepTimeMinutesErrors = b;
+        OnPropertyChanged(nameof(HasRecipeStepTimeMinutesErrors));
+        OnPropertyChanged(nameof(HasValidationErrors));
     }
 }

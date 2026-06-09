@@ -60,7 +60,7 @@ public sealed class DishService
 
             if (step.Id == 0)
             {
-                db.RecipeSteps.Add(step);
+                db.RecipeSteps.Add(ConvertToRecipeStep(step));
                 continue;
             }
 
@@ -89,14 +89,13 @@ public sealed class DishService
             for (int x = 0; x < dishIngredients.Count; x++)
             {
                 FullDishIngredient dishIngredient = dish.Ingredients[x];
-                dishIngredient.IngredientId = ingredients
-                    .First(ingredient => ingredient.Name == dishIngredient.Name)
-                    .Id;
+                var ingredient = ingredients
+                    .First(ingredient => ingredient.Name == dishIngredient.Name);
 
                 var updatedIngredient = new DishIngredient()
                 {
                     DishId = dishId,
-                    IngredientId = dishIngredient.IngredientId,
+                    Ingredient = ingredient,
                     Order = dishIngredient.Order,
                     Quantity = dishIngredient.Quantity,
                     MeasurementUnit = dishIngredient.MeasurementUnit,
@@ -142,6 +141,40 @@ public sealed class DishService
         };
 
         return dish;
+    }
+
+    public static List<FullEditRecipeStep> ConvertToFullEditRecipeSteps(List<RecipeStep> recipeSteps)
+    {
+        List<FullEditRecipeStep> editRecipeSteps = new();
+
+        foreach (var step in recipeSteps)
+        {
+            editRecipeSteps.Add(new FullEditRecipeStep()
+            {
+                Id = step.Id,
+                DishId = step.DishId,
+                Order = step.Order,
+                Description = step.Description,
+                TimeMinutes = step.TimeMinutes,
+                Comment = step.Comment,
+                TimeMinutesError = null
+            });
+        }
+
+        return editRecipeSteps;
+    }
+
+    public static RecipeStep ConvertToRecipeStep(FullEditRecipeStep editRecipeStep)
+    {
+        return new RecipeStep()
+        {
+            Id = editRecipeStep.Id,
+            DishId = editRecipeStep.DishId,
+            Order = editRecipeStep.Order,
+            Description = editRecipeStep.Description,
+            TimeMinutes = editRecipeStep.TimeMinutes,
+            Comment = editRecipeStep.Comment
+        };
     }
 
     public static List<FullEditingDish> ConvertToFullEditingDishes(List<Dish> dbDishes)
