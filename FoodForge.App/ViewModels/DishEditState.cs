@@ -67,6 +67,11 @@ public sealed class DishEditState : INotifyPropertyChanged
     public ICommand PushUpRecipeStepCommand { get; }
     public ICommand PushDownRecipeStepCommand { get; }
 
+    public bool HasEditingIngredients => EditingIngredients.Count > 0;
+    public bool HasNoEditingIngredients => !HasEditingIngredients;
+    public bool HasEditingRecipeSteps => EditingRecipeSteps.Count > 0;
+    public bool HasNoEditingRecipeSteps => !HasEditingRecipeSteps;
+
     public string? NameError { get; private set; } 
     public string? TasteRatingError { get; private set; }
     public string? SpentTimeMinutesError { get; private set; }
@@ -157,6 +162,14 @@ public sealed class DishEditState : INotifyPropertyChanged
             Order = order,
             DishId = EditingDish.Id
         });
+        
+        InformIngredientUI();
+    }
+
+    private void InformIngredientUI()
+    {
+        OnPropertyChanged(nameof(HasEditingIngredients));
+        OnPropertyChanged(nameof(HasNoEditingIngredients));
     }
 
     private void DeleteIngredient(object? parameter)
@@ -171,6 +184,8 @@ public sealed class DishEditState : INotifyPropertyChanged
         _reorderService.RefreshOrders(EditingIngredients);
 
         EditingIngredients = new ObservableCollection<FullDishIngredient>(EditingIngredients);
+
+        InformIngredientUI();
     }
 
     private void PushUpIngredient(object? parameter)
@@ -210,6 +225,14 @@ public sealed class DishEditState : INotifyPropertyChanged
             Order = order,
             DishId = EditingDish.Id
         });
+
+        InformRecipeStepsUI();
+    }
+
+    private void InformRecipeStepsUI()
+    {
+        OnPropertyChanged(nameof(HasEditingRecipeSteps));
+        OnPropertyChanged(nameof(HasNoEditingRecipeSteps));
     }
 
     private void DeleteRecipeStep(object? parameter)
@@ -224,6 +247,8 @@ public sealed class DishEditState : INotifyPropertyChanged
         _reorderService.RefreshOrders(EditingRecipeSteps);
 
         EditingRecipeSteps = new ObservableCollection<FullEditRecipeStep>(EditingRecipeSteps);
+
+        InformRecipeStepsUI();
     }
 
     private void PushUpRecipeStep(object? parameter)

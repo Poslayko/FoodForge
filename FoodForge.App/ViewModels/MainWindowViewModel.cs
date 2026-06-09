@@ -27,7 +27,10 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
                 return;
 
             _dishes = value;
+
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasNoDishes));
+            OnPropertyChanged(nameof(HasDishes));
         }
     }
 
@@ -47,6 +50,9 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
 
             OnPropertyChanged();
             LoadSelectedDishDetails();
+
+            OnPropertyChanged(nameof(HasSelectedDish));
+            OnPropertyChanged(nameof(HasNoSelectedDish));
         }
     }
 
@@ -75,6 +81,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public bool HasDishes => Dishes.Count > 0;
     public bool IsInEditMode => EditState is not null;
     public bool IsInViewMode => !IsInEditMode;
+    public bool HasSelectedDish => SelectedDish is not null;
+    public bool HasNoSelectedDish => !HasSelectedDish;
 
     public ICommand CreateDishCommand { get; }
     public ICommand DeleteDishCommand { get; }
